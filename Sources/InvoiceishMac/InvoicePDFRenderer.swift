@@ -48,6 +48,7 @@ enum InvoicePDFRenderer {
         let contentWidth = pageRect.width - margin * 2
         let labels = settings.language.labels
 
+        drawPageBackground(pageRect)
         drawWatermark(in: context, pageRect: pageRect)
 
         drawText(
@@ -154,7 +155,7 @@ enum InvoicePDFRenderer {
         let text = "Invoice-ish" as NSString
         let attributes: [NSAttributedString.Key: Any] = [
             .font: NSFont.systemFont(ofSize: 86, weight: .bold),
-            .foregroundColor: NSColor.secondaryLabelColor.withAlphaComponent(0.08)
+            .foregroundColor: PDFColors.watermark
         ]
         let size = text.size(withAttributes: attributes)
         text.draw(at: CGPoint(x: -size.width / 2, y: -size.height / 2), withAttributes: attributes)
@@ -162,9 +163,14 @@ enum InvoicePDFRenderer {
         context.restoreGState()
     }
 
+    private static func drawPageBackground(_ pageRect: CGRect) {
+        PDFColors.page.setFill()
+        pageRect.fill()
+    }
+
     private static func drawRule(x: CGFloat, y: CGFloat, width: CGFloat, in context: CGContext) {
         context.saveGState()
-        context.setStrokeColor(NSColor.separatorColor.cgColor)
+        context.setStrokeColor(PDFColors.rule.cgColor)
         context.setLineWidth(1)
         context.move(to: CGPoint(x: x, y: y))
         context.addLine(to: CGPoint(x: x + width, y: y))
@@ -202,67 +208,75 @@ private enum PDFRenderError: LocalizedError {
 
 private let titleAttributes: [NSAttributedString.Key: Any] = [
     .font: NSFont.systemFont(ofSize: 30, weight: .bold),
-    .foregroundColor: NSColor.labelColor
+    .foregroundColor: PDFColors.primary
 ]
 
 private let headlineAttributes: [NSAttributedString.Key: Any] = [
     .font: NSFont.systemFont(ofSize: 14, weight: .semibold),
-    .foregroundColor: NSColor.labelColor
+    .foregroundColor: PDFColors.primary
 ]
 
 private let bodyAttributes: [NSAttributedString.Key: Any] = [
     .font: NSFont.systemFont(ofSize: 12),
-    .foregroundColor: NSColor.labelColor
+    .foregroundColor: PDFColors.primary
 ]
 
 private let bodyBoldAttributes: [NSAttributedString.Key: Any] = [
     .font: NSFont.systemFont(ofSize: 13, weight: .semibold),
-    .foregroundColor: NSColor.labelColor
+    .foregroundColor: PDFColors.primary
 ]
 
 private let secondaryAttributes: [NSAttributedString.Key: Any] = [
     .font: NSFont.systemFont(ofSize: 11),
-    .foregroundColor: NSColor.secondaryLabelColor
+    .foregroundColor: PDFColors.secondary
 ]
 
 private let captionAttributes: [NSAttributedString.Key: Any] = [
     .font: NSFont.systemFont(ofSize: 10, weight: .semibold),
-    .foregroundColor: NSColor.secondaryLabelColor
+    .foregroundColor: PDFColors.secondary
 ]
 
 private let rightAlignedSecondaryAttributes: [NSAttributedString.Key: Any] = [
     .font: NSFont.systemFont(ofSize: 11),
-    .foregroundColor: NSColor.secondaryLabelColor,
+    .foregroundColor: PDFColors.secondary,
     .paragraphStyle: rightAlignedParagraphStyle
 ]
 
 private let tableHeaderAttributes: [NSAttributedString.Key: Any] = [
     .font: NSFont.systemFont(ofSize: 10, weight: .semibold),
-    .foregroundColor: NSColor.secondaryLabelColor
+    .foregroundColor: PDFColors.secondary
 ]
 
 private let tableHeaderRightAttributes: [NSAttributedString.Key: Any] = [
     .font: NSFont.systemFont(ofSize: 10, weight: .semibold),
-    .foregroundColor: NSColor.secondaryLabelColor,
+    .foregroundColor: PDFColors.secondary,
     .paragraphStyle: rightAlignedParagraphStyle
 ]
 
 private let amountAttributes: [NSAttributedString.Key: Any] = [
     .font: NSFont.monospacedDigitSystemFont(ofSize: 12, weight: .regular),
-    .foregroundColor: NSColor.labelColor,
+    .foregroundColor: PDFColors.primary,
     .paragraphStyle: rightAlignedParagraphStyle
 ]
 
 private let totalLabelAttributes: [NSAttributedString.Key: Any] = [
     .font: NSFont.systemFont(ofSize: 16, weight: .semibold),
-    .foregroundColor: NSColor.labelColor
+    .foregroundColor: PDFColors.primary
 ]
 
 private let totalAmountAttributes: [NSAttributedString.Key: Any] = [
     .font: NSFont.monospacedDigitSystemFont(ofSize: 18, weight: .bold),
-    .foregroundColor: NSColor.labelColor,
+    .foregroundColor: PDFColors.primary,
     .paragraphStyle: rightAlignedParagraphStyle
 ]
+
+private enum PDFColors {
+    static let page = NSColor(calibratedWhite: 1.0, alpha: 1.0)
+    static let primary = NSColor(calibratedWhite: 0.08, alpha: 1.0)
+    static let secondary = NSColor(calibratedWhite: 0.42, alpha: 1.0)
+    static let rule = NSColor(calibratedWhite: 0.82, alpha: 1.0)
+    static let watermark = NSColor(calibratedWhite: 0.08, alpha: 0.055)
+}
 
 private let rightAlignedParagraphStyle: NSParagraphStyle = {
     let style = NSMutableParagraphStyle()
