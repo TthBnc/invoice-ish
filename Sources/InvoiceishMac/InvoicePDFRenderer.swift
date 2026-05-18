@@ -114,8 +114,12 @@ enum InvoicePDFRenderer {
     }
 
     private static func drawSender(_ sender: SenderDetails, at origin: CGPoint, width: CGFloat) {
-        drawText("From", in: CGRect(x: origin.x, y: origin.y, width: width, height: 18), attributes: captionAttributes)
-        drawText(sender.name.isEmpty ? "Invoice-ish user" : sender.name, in: CGRect(x: origin.x, y: origin.y + 26, width: width, height: 20), attributes: bodyBoldAttributes)
+        drawContactBlock(
+            label: "From",
+            name: sender.name.isEmpty ? "Invoice-ish user" : sender.name,
+            at: origin,
+            width: width
+        )
 
         var detailLines: [String] = []
         if !sender.contact.isEmpty {
@@ -129,8 +133,17 @@ enum InvoicePDFRenderer {
     }
 
     private static func drawRecipient(_ recipient: String, labels: InvoiceLabels, at origin: CGPoint, width: CGFloat) {
-        drawText(labels.billTo, in: CGRect(x: origin.x, y: origin.y, width: width, height: 18), attributes: captionAttributes)
-        drawText(recipient, in: CGRect(x: origin.x, y: origin.y + 26, width: width, height: 30), attributes: bodyBoldAttributes)
+        drawContactBlock(
+            label: labels.billTo,
+            name: recipient,
+            at: origin,
+            width: width
+        )
+    }
+
+    private static func drawContactBlock(label: String, name: String, at origin: CGPoint, width: CGFloat) {
+        drawText(label, in: CGRect(x: origin.x, y: origin.y, width: width, height: 18), attributes: captionAttributes)
+        drawText(name, in: CGRect(x: origin.x, y: origin.y + 26, width: width, height: 20), attributes: bodyBoldAttributes)
     }
 
     private static func drawTableHeader(labels: InvoiceLabels, x: CGFloat, y: CGFloat, width: CGFloat) {
