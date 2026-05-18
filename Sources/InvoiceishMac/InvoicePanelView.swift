@@ -177,7 +177,7 @@ struct InvoicePanelView: View {
             }
         case .success(let url):
             HStack(spacing: 8) {
-                StatusPill(text: "Generated and copied", tone: .success)
+                StatusPill(text: "Generated", tone: .success)
                     .help(url.path)
 
                 Button {
@@ -187,6 +187,14 @@ struct InvoicePanelView: View {
                 }
                 .accessibilityLabel("Open generated PDF")
                 .accessibilityHint("Opens the generated PDF in the default PDF viewer.")
+
+                Button {
+                    openGeneratedFolder(url)
+                } label: {
+                    Label("Open Folder", systemImage: "folder")
+                }
+                .accessibilityLabel("Open generated PDF folder")
+                .accessibilityHint("Opens the generated PDF's folder in Finder.")
             }
             .transition(.opacity)
         case .failure(let message):
@@ -228,7 +236,7 @@ struct InvoicePanelView: View {
             }
             .buttonStyle(.borderedProminent)
             .disabled(!canGenerate)
-            .accessibilityHint(canGenerate ? "Creates a PDF and copies it to the clipboard." : "Complete required invoice fields before generating.")
+            .accessibilityHint(canGenerate ? "Creates a PDF in the output folder." : "Complete required invoice fields before generating.")
         }
     }
 
@@ -302,6 +310,10 @@ struct InvoicePanelView: View {
 
     private func openGeneratedPDF(_ url: URL) {
         NSWorkspace.shared.open(url)
+    }
+
+    private func openGeneratedFolder(_ url: URL) {
+        NSWorkspace.shared.open(url.deletingLastPathComponent())
     }
 
     private func withOptionalAnimation(_ updates: () -> Void) {

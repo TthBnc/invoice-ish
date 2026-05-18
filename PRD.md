@@ -23,8 +23,8 @@ One person using their own Mac, mostly for jokes with friends. No accounting, no
 7. User optionally adds a short note.
 8. User clicks `Generate`.
 9. App creates a PDF in `~/Documents/Invoice-ish/`.
-10. App copies the generated PDF to the clipboard.
-11. User can paste it into Messages, Mail, Slack, etc.
+10. App shows success actions for opening the PDF or its folder.
+11. User can drag, attach, or send the PDF from Finder.
 
 ## MVP Features
 
@@ -84,11 +84,12 @@ One person using their own Mac, mostly for jokes with friends. No accounting, no
 - EUR: `€15.00`
 - MVP can keep currency conversion out of scope. User manually enters the amount.
 
-## Clipboard Behavior
+## Generated File Actions
 
-- After generation, app writes the PDF file URL to the macOS pasteboard.
-- Also attempts to write PDF data where supported, so pasting into apps works as naturally as possible.
-- Show a success state: `Generated and copied`.
+- After generation, app keeps the PDF in the configured output folder.
+- Show a success state: `Generated`.
+- Provide an action to open the generated PDF.
+- Provide an action to open the generated PDF's folder in Finder.
 
 ## Validation
 
@@ -136,7 +137,7 @@ One person using their own Mac, mostly for jokes with friends. No accounting, no
 - SwiftUI settings window
 - `UserDefaults` or `AppStorage` for preferences
 - `PDFKit` or Core Graphics for PDF creation
-- `NSPasteboard` for clipboard copy
+- `NSWorkspace` for opening generated files and folders
 - `FileManager` for saving into Documents
 
 ## Acceptance Criteria
@@ -151,6 +152,7 @@ One person using their own Mac, mostly for jokes with friends. No accounting, no
 - User can set a default amount that pre-fills new item rows.
 - Clicking generate creates a valid PDF in Documents.
 - The generated PDF includes the `Invoice-ish` watermark.
-- The generated PDF is copied to clipboard.
+- User can open the generated PDF from the success state.
+- User can open the generated PDF's folder in Finder from the success state.
 - Invoice number increments after each successful generation.
 - App works offline.

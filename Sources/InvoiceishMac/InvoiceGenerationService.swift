@@ -27,7 +27,6 @@ enum InvoiceGenerationService {
             date: date,
             outputURL: outputURL
         )
-        try PasteboardWriter.copyPDF(at: outputURL)
 
         return outputURL
     }
