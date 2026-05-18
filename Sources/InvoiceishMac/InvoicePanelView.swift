@@ -21,6 +21,7 @@ struct InvoicePanelView: View {
     @State private var didApplyDefaultCurrency = false
     @State private var generationState = GenerationState.idle
     @State private var isGenerating = false
+    @State private var isPanelPresented = false
 
     private var draft: InvoiceDraft {
         InvoiceDraft(
@@ -63,7 +64,14 @@ struct InvoicePanelView: View {
         }
         .padding(16)
         .nativePanelBackground()
-        .onAppear(perform: applyDefaultCurrencyOnce)
+        .panelEntrance(isPresented: isPanelPresented, reduceMotion: reduceMotion)
+        .onAppear {
+            applyDefaultCurrencyOnce()
+            animatePanelEntrance()
+        }
+        .onDisappear {
+            isPanelPresented = false
+        }
         .animation(reduceMotion ? nil : .easeOut(duration: 0.16), value: items)
         .animation(reduceMotion ? nil : .easeOut(duration: 0.16), value: generationState)
     }
@@ -223,6 +231,21 @@ struct InvoicePanelView: View {
 
         selectedCurrencyRaw = defaultCurrencyRaw
         didApplyDefaultCurrency = true
+    }
+
+    private func animatePanelEntrance() {
+        isPanelPresented = false
+
+        guard !reduceMotion else {
+            isPanelPresented = true
+            return
+        }
+
+        DispatchQueue.main.async {
+            withAnimation(.interactiveSpring(response: 0.24, dampingFraction: 0.9, blendDuration: 0.08)) {
+                isPanelPresented = true
+            }
+        }
     }
 
     private func remove(itemID: UUID) {

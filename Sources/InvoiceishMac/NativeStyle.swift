@@ -77,4 +77,20 @@ extension View {
     func nativePanelBackground() -> some View {
         modifier(NativePanelBackground())
     }
+
+    func panelEntrance(isPresented: Bool, reduceMotion: Bool) -> some View {
+        modifier(PanelEntranceModifier(isPresented: isPresented, reduceMotion: reduceMotion))
+    }
+}
+
+private struct PanelEntranceModifier: ViewModifier {
+    let isPresented: Bool
+    let reduceMotion: Bool
+
+    func body(content: Content) -> some View {
+        content
+            .opacity(isPresented ? 1 : 0)
+            .scaleEffect(reduceMotion || isPresented ? 1 : 0.975, anchor: .top)
+            .offset(y: reduceMotion || isPresented ? 0 : -4)
+    }
 }
