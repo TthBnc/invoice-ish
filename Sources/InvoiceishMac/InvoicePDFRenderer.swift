@@ -21,7 +21,7 @@ enum InvoicePDFRenderer {
         context.scaleBy(x: 1, y: -1)
 
         NSGraphicsContext.saveGraphicsState()
-        NSGraphicsContext.current = NSGraphicsContext(cgContext: context, flipped: false)
+        NSGraphicsContext.current = NSGraphicsContext(cgContext: context, flipped: true)
         drawPage(
             in: context,
             pageRect: mediaBox,
