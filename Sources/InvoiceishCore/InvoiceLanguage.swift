@@ -22,6 +22,7 @@ public enum InvoiceLanguage: String, CaseIterable, Codable, Equatable, Identifia
                 invoice: "Invoice",
                 billTo: "Bill to",
                 date: "Date",
+                dueDate: "Due date",
                 description: "Description",
                 amount: "Amount",
                 total: "Total",
@@ -32,6 +33,7 @@ public enum InvoiceLanguage: String, CaseIterable, Codable, Equatable, Identifia
                 invoice: "Számla",
                 billTo: "Címzett",
                 date: "Dátum",
+                dueDate: "Fizetési határidő",
                 description: "Megnevezés",
                 amount: "Összeg",
                 total: "Végösszeg",
@@ -45,6 +47,7 @@ public struct InvoiceLabels: Equatable, Sendable {
     public let invoice: String
     public let billTo: String
     public let date: String
+    public let dueDate: String
     public let description: String
     public let amount: String
     public let total: String

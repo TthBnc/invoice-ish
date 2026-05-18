@@ -8,6 +8,7 @@ struct SettingsView: View {
     @AppStorage(SettingsKeys.senderContact) private var senderContact = ""
     @AppStorage(SettingsKeys.senderAddress) private var senderAddress = ""
     @AppStorage(SettingsKeys.defaultCurrency) private var defaultCurrencyRaw = AppDefaults.defaultCurrency
+    @AppStorage(SettingsKeys.defaultAmount) private var defaultAmount = AppDefaults.defaultAmount
     @AppStorage(SettingsKeys.invoiceNumberPrefix) private var invoiceNumberPrefix = AppDefaults.invoiceNumberPrefix
     @AppStorage(SettingsKeys.nextInvoiceNumber) private var nextInvoiceNumber = AppDefaults.nextInvoiceNumber
     @AppStorage(SettingsKeys.outputFolderPath) private var outputFolderPath = AppDefaults.outputFolderPath
@@ -29,6 +30,8 @@ struct SettingsView: View {
                     }
                 }
 
+                TextField("Default amount", text: $defaultAmount)
+                    .accessibilityHint("Used to prefill new item rows.")
                 TextField("Invoice number prefix", text: $invoiceNumberPrefix)
                 Stepper("Next invoice number: \(nextInvoiceNumber)", value: $nextInvoiceNumber, in: 1...999_999)
             }

@@ -42,10 +42,10 @@ final class MenuBarController: NSObject, NSPopoverDelegate {
         let panel = InvoicePanelView()
             .frame(width: 430)
         let host = NSHostingController(rootView: panel)
-        host.view.frame = NSRect(origin: .zero, size: NSSize(width: 430, height: 440))
+        host.view.frame = NSRect(origin: .zero, size: NSSize(width: 430, height: 470))
 
         popover.contentViewController = host
-        popover.contentSize = NSSize(width: 430, height: 440)
+        popover.contentSize = NSSize(width: 430, height: 470)
     }
 
     private func configureQuitMenu() {

@@ -19,11 +19,12 @@ One person using their own Mac, mostly for jokes with friends. No accounting, no
 3. User enters who the invoice is for.
 4. User adds one or more line items, each with a description and amount.
 5. User selects currency: `Ft`, `$`, or `€`.
-6. User optionally adds a short note.
-7. User clicks `Generate`.
-8. App creates a PDF in `~/Documents/Invoice-ish/`.
-9. App copies the generated PDF to the clipboard.
-10. User can paste it into Messages, Mail, Slack, etc.
+6. User optionally changes the due date, defaulting to today.
+7. User optionally adds a short note.
+8. User clicks `Generate`.
+9. App creates a PDF in `~/Documents/Invoice-ish/`.
+10. App copies the generated PDF to the clipboard.
+11. User can paste it into Messages, Mail, Slack, etc.
 
 ## MVP Features
 
@@ -33,12 +34,14 @@ One person using their own Mac, mostly for jokes with friends. No accounting, no
 - Fields:
   - `Bill to`
   - Currency selector: `Ft`, `$`, `€`
+  - Due date, defaulting to today
   - Item rows: description + amount
   - Add item button
   - Remove item button per row
   - Optional note
 - Actions:
   - `Generate PDF`
+  - `Reset`
   - `Settings`
   - `Quit`
 
@@ -48,6 +51,7 @@ One person using their own Mac, mostly for jokes with friends. No accounting, no
 - Header: `Invoice-ish`
 - Invoice number, e.g. `ISH-0001`
 - Date generated
+- Due date
 - Sender details from settings
 - Recipient name
 - Table of items
@@ -55,8 +59,8 @@ One person using their own Mac, mostly for jokes with friends. No accounting, no
 - Optional note
 - Large, subtle `Invoice-ish` watermark in the background.
 - Language-sensitive labels:
-  - English: `Invoice`, `Bill to`, `Date`, `Description`, `Amount`, `Total`
-  - Hungarian: `Számla`, `Címzett`, `Dátum`, `Megnevezés`, `Összeg`, `Végösszeg`
+  - English: `Invoice`, `Bill to`, `Date`, `Due date`, `Description`, `Amount`, `Total`
+  - Hungarian: `Számla`, `Címzett`, `Dátum`, `Fizetési határidő`, `Megnevezés`, `Összeg`, `Végösszeg`
 
 ## Settings Window
 
@@ -67,6 +71,7 @@ One person using their own Mac, mostly for jokes with friends. No accounting, no
   - Email or phone
   - Address, optional
   - Default currency
+  - Default amount for new item rows
   - Invoice number prefix, default `ISH`
   - Next invoice number
   - Output folder, default `~/Documents/Invoice-ish/`
@@ -124,7 +129,7 @@ One person using their own Mac, mostly for jokes with friends. No accounting, no
 ## Technical Stack
 
 - SwiftUI macOS app
-- `MenuBarExtra` for menu bar presence
+- `NSStatusItem` and `NSPopover` for menu bar presence and native popover animation
 - Native SwiftUI/AppKit materials for Liquid Glass-style UI where supported
 - Runtime or availability checks for older macOS fallback styling
 - SwiftUI animation APIs for native transitions and feedback
@@ -140,7 +145,10 @@ One person using their own Mac, mostly for jokes with friends. No accounting, no
 - Clicking the icon opens the invoice panel.
 - User can create, edit, and remove item rows.
 - User can select `Ft`, `$`, or `€`.
+- User can set a due date, defaulting to today.
+- User can reset the current draft from the menu bar panel.
 - User can open settings and save sender/language preferences.
+- User can set a default amount that pre-fills new item rows.
 - Clicking generate creates a valid PDF in Documents.
 - The generated PDF includes the `Invoice-ish` watermark.
 - The generated PDF is copied to clipboard.

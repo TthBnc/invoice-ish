@@ -54,6 +54,7 @@ final class InvoiceishCoreTests: XCTestCase {
 
         XCTAssertEqual(labels.invoice, "Számla")
         XCTAssertEqual(labels.billTo, "Címzett")
+        XCTAssertEqual(labels.dueDate, "Fizetési határidő")
         XCTAssertEqual(labels.total, "Végösszeg")
     }
 }

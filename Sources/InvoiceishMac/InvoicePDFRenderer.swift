@@ -67,11 +67,16 @@ enum InvoicePDFRenderer {
             in: CGRect(x: margin + contentWidth / 2, y: 94, width: contentWidth / 2, height: 22),
             attributes: rightAlignedSecondaryAttributes
         )
+        drawText(
+            "\(labels.dueDate): \(formatted(date: draft.dueDate, language: settings.language))",
+            in: CGRect(x: margin + contentWidth / 2, y: 114, width: contentWidth / 2, height: 22),
+            attributes: rightAlignedSecondaryAttributes
+        )
 
-        drawSender(settings.sender, at: CGPoint(x: margin, y: 140), width: contentWidth / 2 - 12)
-        drawRecipient(draft.recipient, labels: labels, at: CGPoint(x: margin + contentWidth / 2 + 12, y: 140), width: contentWidth / 2 - 12)
+        drawSender(settings.sender, at: CGPoint(x: margin, y: 154), width: contentWidth / 2 - 12)
+        drawRecipient(draft.recipient, labels: labels, at: CGPoint(x: margin + contentWidth / 2 + 12, y: 154), width: contentWidth / 2 - 12)
 
-        let tableTop: CGFloat = 250
+        let tableTop: CGFloat = 268
         drawTableHeader(labels: labels, x: margin, y: tableTop, width: contentWidth)
 
         var currentY = tableTop + 34

@@ -19,6 +19,11 @@ struct DraftLineItem: Identifiable, Equatable {
     var invoiceItem: InvoiceItem {
         InvoiceItem(id: id, description: description, amount: amount)
     }
+
+    var isBlank: Bool {
+        description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+            amountText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
 }
 
 enum DecimalParser {

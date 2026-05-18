@@ -16,17 +16,20 @@ public struct InvoiceDraft: Codable, Equatable, Sendable {
     public var recipient: String
     public var currency: InvoiceCurrency
     public var items: [InvoiceItem]
+    public var dueDate: Date
     public var note: String
 
     public init(
         recipient: String = "",
         currency: InvoiceCurrency = .huf,
         items: [InvoiceItem] = [],
+        dueDate: Date = Date(),
         note: String = ""
     ) {
         self.recipient = recipient
         self.currency = currency
         self.items = items
+        self.dueDate = dueDate
         self.note = note
     }
 

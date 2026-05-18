@@ -7,6 +7,7 @@ enum SettingsKeys {
     static let senderContact = "settings.senderContact"
     static let senderAddress = "settings.senderAddress"
     static let defaultCurrency = "settings.defaultCurrency"
+    static let defaultAmount = "settings.defaultAmount"
     static let invoiceNumberPrefix = "settings.invoiceNumberPrefix"
     static let nextInvoiceNumber = "settings.nextInvoiceNumber"
     static let outputFolderPath = "settings.outputFolderPath"
@@ -15,6 +16,7 @@ enum SettingsKeys {
 enum AppDefaults {
     static let language = InvoiceLanguage.english.rawValue
     static let defaultCurrency = InvoiceCurrency.huf.rawValue
+    static let defaultAmount = ""
     static let invoiceNumberPrefix = "ISH"
     static let nextInvoiceNumber = 1
     static let outputFolderPath = InvoiceSettingsSnapshot.defaultOutputFolderPath()

@@ -10,15 +10,17 @@ struct InvoicePanelView: View {
     @AppStorage(SettingsKeys.senderContact) private var senderContact = ""
     @AppStorage(SettingsKeys.senderAddress) private var senderAddress = ""
     @AppStorage(SettingsKeys.defaultCurrency) private var defaultCurrencyRaw = AppDefaults.defaultCurrency
+    @AppStorage(SettingsKeys.defaultAmount) private var defaultAmount = AppDefaults.defaultAmount
     @AppStorage(SettingsKeys.invoiceNumberPrefix) private var invoiceNumberPrefix = AppDefaults.invoiceNumberPrefix
     @AppStorage(SettingsKeys.nextInvoiceNumber) private var nextInvoiceNumber = AppDefaults.nextInvoiceNumber
     @AppStorage(SettingsKeys.outputFolderPath) private var outputFolderPath = AppDefaults.outputFolderPath
 
     @State private var recipient = ""
     @State private var selectedCurrencyRaw = AppDefaults.defaultCurrency
+    @State private var dueDate = Date()
     @State private var note = ""
     @State private var items = [DraftLineItem()]
-    @State private var didApplyDefaultCurrency = false
+    @State private var didApplyDefaults = false
     @State private var generationState = GenerationState.idle
     @State private var isGenerating = false
 
@@ -27,6 +29,7 @@ struct InvoicePanelView: View {
             recipient: recipient,
             currency: InvoiceCurrency(rawValue: selectedCurrencyRaw) ?? .huf,
             items: items.map(\.invoiceItem),
+            dueDate: dueDate,
             note: note
         )
     }
@@ -63,7 +66,7 @@ struct InvoicePanelView: View {
         }
         .padding(16)
         .nativePanelBackground()
-        .onAppear(perform: applyDefaultCurrencyOnce)
+        .onAppear(perform: applyDefaultsOnce)
         .animation(reduceMotion ? nil : .easeOut(duration: 0.16), value: items)
         .animation(reduceMotion ? nil : .easeOut(duration: 0.16), value: generationState)
     }
@@ -112,6 +115,16 @@ struct InvoicePanelView: View {
                 .pickerStyle(.segmented)
                 .accessibilityLabel("Currency")
             }
+
+            GridRow {
+                Text("Due date")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                DatePicker("", selection: $dueDate, displayedComponents: .date)
+                    .labelsHidden()
+                    .datePickerStyle(.compact)
+                    .accessibilityLabel("Due date")
+            }
         }
     }
 
@@ -123,7 +136,7 @@ struct InvoicePanelView: View {
                 Spacer()
                 Button {
                     withOptionalAnimation {
-                        items.append(DraftLineItem())
+                        items.append(makeDraftLineItem())
                     }
                 } label: {
                     Label("Add item", systemImage: "plus.circle")
@@ -192,6 +205,14 @@ struct InvoicePanelView: View {
                 Label("Quit", systemImage: "power")
             }
 
+            Button {
+                resetDraft()
+            } label: {
+                Label("Reset", systemImage: "arrow.counterclockwise")
+            }
+            .disabled(isGenerating)
+            .accessibilityHint("Clears the current invoice draft.")
+
             Spacer()
 
             Button {
@@ -226,18 +247,32 @@ struct InvoicePanelView: View {
         }
     }
 
-    private func applyDefaultCurrencyOnce() {
-        guard !didApplyDefaultCurrency else {
+    private func applyDefaultsOnce() {
+        guard !didApplyDefaults else {
             return
         }
 
         selectedCurrencyRaw = defaultCurrencyRaw
-        didApplyDefaultCurrency = true
+        if items.count == 1, items[0].isBlank {
+            items[0] = makeDraftLineItem()
+        }
+        didApplyDefaults = true
+    }
+
+    private func resetDraft() {
+        withOptionalAnimation {
+            recipient = ""
+            selectedCurrencyRaw = defaultCurrencyRaw
+            dueDate = Date()
+            note = ""
+            items = [makeDraftLineItem()]
+            generationState = .idle
+        }
     }
 
     private func remove(itemID: UUID) {
         guard items.count > 1 else {
-            items[0] = DraftLineItem()
+            items[0] = makeDraftLineItem()
             return
         }
 
@@ -275,6 +310,10 @@ struct InvoicePanelView: View {
         } else {
             withAnimation(.easeOut(duration: 0.16), updates)
         }
+    }
+
+    private func makeDraftLineItem() -> DraftLineItem {
+        DraftLineItem(amountText: defaultAmount.trimmingCharacters(in: .whitespacesAndNewlines))
     }
 }
 
