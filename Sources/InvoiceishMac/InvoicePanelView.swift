@@ -163,9 +163,19 @@ struct InvoicePanelView: View {
                     .transition(.opacity)
             }
         case .success(let url):
-            StatusPill(text: "Generated and copied", tone: .success)
-                .help(url.path)
-                .transition(.opacity)
+            HStack(spacing: 8) {
+                StatusPill(text: "Generated and copied", tone: .success)
+                    .help(url.path)
+
+                Button {
+                    openGeneratedPDF(url)
+                } label: {
+                    Label("Open", systemImage: "arrow.up.right.square")
+                }
+                .accessibilityLabel("Open generated PDF")
+                .accessibilityHint("Opens the generated PDF in the default PDF viewer.")
+            }
+            .transition(.opacity)
         case .failure(let message):
             StatusPill(text: message, tone: .error)
                 .transition(.opacity)
@@ -253,6 +263,10 @@ struct InvoicePanelView: View {
         }
 
         isGenerating = false
+    }
+
+    private func openGeneratedPDF(_ url: URL) {
+        NSWorkspace.shared.open(url)
     }
 
     private func withOptionalAnimation(_ updates: () -> Void) {
