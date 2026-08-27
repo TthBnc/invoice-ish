@@ -1,9 +1,13 @@
-# Invoice-ish Web
+# Invoice-ish
 
-Invoice-ish is a small public web app for making playful invoices. Anyone can
-open the site and create an invoice. Profiles are display-only records: they
-do not have user accounts or passwords. A shared admin passphrase unlocks the
-profile and balance management controls.
+Invoice-ish includes a public web app and the original macOS menu bar app for
+making playful invoices.
+
+## Web app
+
+Anyone can open the site and create an invoice. Profiles are display-only
+records: they do not have user accounts or passwords. A shared admin
+passphrase unlocks the profile and balance management controls.
 
 ## Local setup
 
@@ -143,3 +147,35 @@ npm run typecheck
 npm test
 npm run build
 ```
+
+## macOS menu bar app
+
+Invoice-ish is a playful macOS menu bar app for quickly generating simple friend invoices.
+
+The project is currently in PRD and implementation-planning phase.
+
+- [Product Requirements](PRD.md)
+- [Implementation Plan](IMPLEMENTATION_PLAN.md)
+
+## Development
+
+The current implementation is a Swift package with:
+
+- `InvoiceishCore`: invoice models, validation, numbering, localization labels, and currency formatting.
+- `Invoiceish`: a macOS SwiftUI menu bar executable using `MenuBarExtra`.
+
+Build:
+
+```bash
+swift build
+```
+
+Create a local `.app` bundle:
+
+```bash
+./scripts/build-app-bundle.sh
+```
+
+The bundle is written to `.build/release/Invoice-ish.app` and includes `LSUIElement`, so it behaves as a menu-bar utility instead of a normal Dock app.
+
+Tests are included under `Tests/InvoiceishCoreTests`. Running them requires a full Xcode installation/selection because this machine's active Command Line Tools setup does not expose XCTest correctly.
