@@ -37,8 +37,6 @@ body {
 }
 
 .interactive-background {
-  --pointer-x: 50vw;
-  --pointer-y: 34vh;
   --watermark-x: 0px;
   --watermark-y: 0px;
   position: fixed;
@@ -52,20 +50,13 @@ body {
 .ledger-field {
   position: absolute;
   inset: 0;
-  background-image:
-    radial-gradient(
-      circle 300px at var(--pointer-x) var(--pointer-y),
-      rgb(47 106 84 / 0.1),
-      rgb(47 106 84 / 0.035) 38%,
-      transparent 72%
-    ),
-    repeating-linear-gradient(
-      to bottom,
-      transparent 0,
-      transparent 31px,
-      rgb(47 106 84 / 0.055) 31px,
-      rgb(47 106 84 / 0.055) 32px
-    );
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 31px,
+    rgb(47 106 84 / 0.055) 31px,
+    rgb(47 106 84 / 0.055) 32px
+  );
   mask-image: linear-gradient(to bottom, transparent, black 9%, black 88%, transparent);
 }
 
@@ -73,7 +64,7 @@ body {
   position: absolute;
   top: 29vh;
   left: 50%;
-  color: rgb(47 106 84 / 0.045);
+  color: rgb(47 106 84 / 0.038);
   font-size: clamp(112px, 18vw, 276px);
   font-weight: 750;
   letter-spacing: -0.085em;
@@ -313,23 +304,16 @@ legend { padding: 0 7px; color: var(--accent-strong); font-size: 12px; font-weig
   }
 
   .ledger-field {
-    background-image:
-      radial-gradient(
-        circle 300px at var(--pointer-x) var(--pointer-y),
-        rgb(135 190 160 / 0.09),
-        rgb(135 190 160 / 0.03) 38%,
-        transparent 72%
-      ),
-      repeating-linear-gradient(
-        to bottom,
-        transparent 0,
-        transparent 31px,
-        rgb(135 190 160 / 0.055) 31px,
-        rgb(135 190 160 / 0.055) 32px
-      );
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 31px,
+      rgb(135 190 160 / 0.055) 31px,
+      rgb(135 190 160 / 0.055) 32px
+    );
   }
 
-  .background-watermark { color: rgb(135 190 160 / 0.045); }
+  .background-watermark { color: rgb(135 190 160 / 0.025); }
 }
 
 @media (prefers-reduced-motion: reduce) {

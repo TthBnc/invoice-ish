@@ -15,32 +15,45 @@ export function InteractiveBackground() {
     }
 
     let frame = 0;
-    let pointerX = window.innerWidth / 2;
-    let pointerY = window.innerHeight / 2;
+    let currentX = 0;
+    let currentY = 0;
+    let targetX = 0;
+    let targetY = 0;
 
-    const renderPointer = () => {
-      const xProgress = pointerX / window.innerWidth;
-      const yProgress = pointerY / window.innerHeight;
-      const watermarkX = (xProgress - 0.5) * 18;
-      const watermarkY = (yProgress - 0.5) * 10;
+    const renderWatermark = () => {
+      currentX += (targetX - currentX) * 0.12;
+      currentY += (targetY - currentY) * 0.12;
 
-      background.style.setProperty("--pointer-x", `${pointerX}px`);
-      background.style.setProperty("--pointer-y", `${pointerY}px`);
-      background.style.setProperty("--watermark-x", `${watermarkX}px`);
-      background.style.setProperty("--watermark-y", `${watermarkY}px`);
-      frame = 0;
+      background.style.setProperty("--watermark-x", `${currentX}px`);
+      background.style.setProperty("--watermark-y", `${currentY}px`);
+
+      if (Math.abs(targetX - currentX) > 0.02 || Math.abs(targetY - currentY) > 0.02) {
+        frame = window.requestAnimationFrame(renderWatermark);
+      } else {
+        frame = 0;
+      }
     };
 
     const handlePointerMove = (event: PointerEvent) => {
-      pointerX = event.clientX;
-      pointerY = event.clientY;
-      if (!frame) frame = window.requestAnimationFrame(renderPointer);
+      targetX = (event.clientX / window.innerWidth - 0.5) * 6;
+      targetY = (event.clientY / window.innerHeight - 0.5) * 4;
+      if (!frame) frame = window.requestAnimationFrame(renderWatermark);
+    };
+
+    const resetWatermark = () => {
+      targetX = 0;
+      targetY = 0;
+      if (!frame) frame = window.requestAnimationFrame(renderWatermark);
     };
 
     window.addEventListener("pointermove", handlePointerMove, { passive: true });
+    window.addEventListener("blur", resetWatermark);
+    document.documentElement.addEventListener("pointerleave", resetWatermark);
 
     return () => {
       window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("blur", resetWatermark);
+      document.documentElement.removeEventListener("pointerleave", resetWatermark);
       if (frame) window.cancelAnimationFrame(frame);
     };
   }, []);
