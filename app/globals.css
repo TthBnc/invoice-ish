@@ -36,6 +36,54 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+.interactive-background {
+  --pointer-x: 50vw;
+  --pointer-y: 34vh;
+  --watermark-x: 0px;
+  --watermark-y: 0px;
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--paper);
+}
+
+.ledger-field {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(
+      circle 300px at var(--pointer-x) var(--pointer-y),
+      rgb(47 106 84 / 0.1),
+      rgb(47 106 84 / 0.035) 38%,
+      transparent 72%
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 31px,
+      rgb(47 106 84 / 0.055) 31px,
+      rgb(47 106 84 / 0.055) 32px
+    );
+  mask-image: linear-gradient(to bottom, transparent, black 9%, black 88%, transparent);
+}
+
+.background-watermark {
+  position: absolute;
+  top: 29vh;
+  left: 50%;
+  color: rgb(47 106 84 / 0.045);
+  font-size: clamp(112px, 18vw, 276px);
+  font-weight: 750;
+  letter-spacing: -0.085em;
+  line-height: 0.8;
+  white-space: nowrap;
+  transform: translate3d(calc(-50% + var(--watermark-x)), var(--watermark-y), 0) rotate(-17deg);
+  transform-origin: center;
+  will-change: transform;
+}
+
 button, input, select, textarea { font: inherit; }
 button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 a { color: inherit; }
@@ -46,7 +94,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   outline-offset: 2px;
 }
 
-.app-shell { width: min(1240px, calc(100% - 40px)); margin: 0 auto; }
+.app-shell { position: relative; z-index: 1; width: min(1240px, calc(100% - 40px)); margin: 0 auto; }
 .site-header { display: flex; align-items: center; justify-content: space-between; min-height: 72px; border-bottom: 1px solid var(--line); }
 .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); font-size: 15px; font-weight: 700; letter-spacing: -0.02em; text-decoration: none; }
 .brand-mark, .admin-icon, .profile-avatar { display: inline-grid; place-items: center; flex: 0 0 auto; border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--surface); color: var(--accent); }
@@ -263,9 +311,55 @@ legend { padding: 0 7px; color: var(--accent-strong); font-size: 12px; font-weig
     --line-hover: #7c8076;
     --on-accent: #17231c;
   }
+
+  .ledger-field {
+    background-image:
+      radial-gradient(
+        circle 300px at var(--pointer-x) var(--pointer-y),
+        rgb(135 190 160 / 0.09),
+        rgb(135 190 160 / 0.03) 38%,
+        transparent 72%
+      ),
+      repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 31px,
+        rgb(135 190 160 / 0.055) 31px,
+        rgb(135 190 160 / 0.055) 32px
+      );
+  }
+
+  .background-watermark { color: rgb(135 190 160 / 0.045); }
 }
 
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  .background-watermark { will-change: auto; }
+}
+@media (hover: none), (pointer: coarse) {
+  .ledger-field {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 31px,
+      rgb(47 106 84 / 0.05) 31px,
+      rgb(47 106 84 / 0.05) 32px
+    );
+  }
+  .background-watermark { top: 24vh; font-size: clamp(84px, 24vw, 150px); will-change: auto; }
+}
+@media (prefers-color-scheme: dark) and (hover: none), (prefers-color-scheme: dark) and (pointer: coarse) {
+  .ledger-field {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 31px,
+      rgb(135 190 160 / 0.05) 31px,
+      rgb(135 190 160 / 0.05) 32px
+    );
+  }
+}
 @media (max-width: 1000px) { .invoice-layout, .admin-grid { grid-template-columns: minmax(0, 1fr); } .preview-wrap { position: static; max-width: 680px; } }
 @media (max-width: 760px) {
   .app-shell { width: min(100% - 28px, 620px); }

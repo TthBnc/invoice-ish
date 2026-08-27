@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 
+import { InteractiveBackground } from "@/components/interactive-background";
+
 import "./globals.css";
 
 const geist = Geist({
@@ -16,7 +18,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={geist.variable}>{children}</body>
+      <body className={geist.variable}>
+        <InteractiveBackground />
+        {children}
+      </body>
     </html>
   );
 }
