@@ -7,6 +7,7 @@ import {
   formatInvoiceDate,
   formatInvoiceNumber,
   generateInvoicePdf,
+  syncDueDateWithIssueDate,
   validateInvoice,
 } from "../src/lib/invoice";
 import { PDFDocument } from "pdf-lib";
@@ -55,6 +56,13 @@ describe("invoice formatting", () => {
   it("keeps date-only values on the selected calendar day", () => {
     expect(formatInvoiceDate("2026-08-27", "en")).toContain("Aug 27, 2026");
     expect(formatInvoiceDate("2026-08-27", "hu")).toContain("2026");
+  });
+
+  it("keeps issue and due dates together until due date is changed", () => {
+    expect(syncDueDateWithIssueDate("2026-08-27", "2026-08-27", "2026-09-01", false)).toBe("2026-09-01");
+    expect(syncDueDateWithIssueDate("2026-08-27", "2026-08-27", "2026-09-01", true)).toBe("2026-09-01");
+    expect(syncDueDateWithIssueDate("2026-08-27", "2026-09-10", "2026-09-01", true)).toBe("2026-09-10");
+    expect(syncDueDateWithIssueDate("2026-08-27", "", "2026-09-01", true)).toBe("");
   });
 });
 

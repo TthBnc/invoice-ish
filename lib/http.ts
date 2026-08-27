@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { DatabaseConfigurationError } from "@/lib/db";
 import { hasValidAdminSession } from "@/lib/auth";
+import { InvoiceNumberSequenceError } from "@/lib/invoice-numbers";
 import { ProfileNameConflictError } from "@/lib/profiles";
 
 export function jsonResponse<T>(body: T, status = 200, headers: HeadersInit = {}): NextResponse {
@@ -48,6 +49,10 @@ export function handleRouteError(error: unknown): NextResponse {
 
   if (error instanceof DatabaseConfigurationError) {
     return errorResponse("The database is not configured", 503);
+  }
+
+  if (error instanceof InvoiceNumberSequenceError) {
+    return errorResponse(error.message, 503);
   }
 
   if (error instanceof Error && error.name === "AuthConfigurationError") {

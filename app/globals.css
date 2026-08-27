@@ -86,6 +86,7 @@ textarea { min-height: 78px; padding: 9px 11px; resize: vertical; }
 input::placeholder, textarea::placeholder { color: var(--faint); opacity: 1; }
 input:hover, select:hover, textarea:hover { border-color: var(--line-hover); }
 input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--danger); background: var(--danger-soft); }
+.readonly-field { display: flex; min-height: 42px; align-items: center; padding: 9px 11px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface-soft); color: var(--muted); font-size: 14px; }
 .field-hint, .field-error { margin: 6px 0 0; font-size: 12px; line-height: 1.35; }
 .field-hint { color: var(--muted); }
 .field-error { color: var(--danger); }

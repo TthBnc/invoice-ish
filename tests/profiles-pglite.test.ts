@@ -6,8 +6,10 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { closeDatabase } from "@/lib/db";
 import { ADMIN_SESSION_COOKIE, createAdminSessionToken } from "@/lib/auth";
+import { reserveInvoiceNumber } from "@/lib/invoice-numbers";
 import { POST as createProfileRoute } from "@/app/api/profiles/route";
 import { POST as attachInvoiceRoute } from "@/app/api/profiles/[id]/invoice/route";
+import { POST as reserveInvoiceRoute } from "@/app/api/invoices/reserve/route";
 import {
   attachInvoiceToProfile,
   createLedgerEntry,
@@ -136,6 +138,30 @@ describe("profiles with an isolated local PGlite database", () => {
 
     expect(await deleteProfile(first.id)).toBe(true);
     expect(await deleteProfile(second.id)).toBe(true);
+  });
+
+  it("reserves globally unique, padded invoice numbers under concurrent requests", async () => {
+    expect(await reserveInvoiceNumber()).toBe("INV-0001");
+    expect(await reserveInvoiceNumber()).toBe("INV-0002");
+
+    const responses = await Promise.all(
+      Array.from({ length: 8 }, () => reserveInvoiceRoute()),
+    );
+    expect(responses.every((response) => response.status === 201)).toBe(true);
+    const numbers = await Promise.all(
+      responses.map(async (response) => (await response.json() as { invoiceNumber: string }).invoiceNumber),
+    );
+    expect(new Set(numbers).size).toBe(numbers.length);
+    expect([...numbers].sort()).toEqual([
+      "INV-0003",
+      "INV-0004",
+      "INV-0005",
+      "INV-0006",
+      "INV-0007",
+      "INV-0008",
+      "INV-0009",
+      "INV-0010",
+    ]);
   });
 
   it("exposes public invoice attachment and a conflict response for duplicate profile names", async () => {

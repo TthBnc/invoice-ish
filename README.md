@@ -65,6 +65,13 @@ this API scale. The API calculates `lifetimeChargedCents`,
 `lifetimePaidCents`, and `currentBalanceCents` from the ledger on every read;
 there is no mutable balance column to drift out of sync.
 
+Invoice numbers come from the persistent `invoice_number_sequence` PostgreSQL
+sequence added by migration `004_invoice_number_sequence.sql`. The browser
+reserves the next number only when the visitor downloads a PDF, so abandoned
+drafts do not consume numbers. Sequence gaps are allowed if PDF generation
+fails after reservation. The number is formatted as `INV-0001`, `INV-0002`,
+and so on, with no four-digit upper limit.
+
 ## API
 
 Public reads:
@@ -73,6 +80,8 @@ Public reads:
 - `GET /api/profiles/:id` → `{ profile, transactions }`.
 - `GET /api/profiles/:id/ledger` → `{ profile, transactions }`.
 - `GET /api/auth/status` → `{ authenticated }`.
+- `POST /api/invoices/reserve` → `{ invoiceNumber }`, reserving the next global
+  invoice number for an imminent PDF download.
 
 Admin mutations require the HttpOnly session cookie created by login:
 

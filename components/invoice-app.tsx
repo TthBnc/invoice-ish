@@ -33,6 +33,7 @@ import {
   formatInvoiceDate,
   formatInvoiceNumber,
   formatQuantity,
+  syncDueDateWithIssueDate,
   validateInvoice,
   type InvoiceCurrency,
   type InvoiceLocale,
@@ -142,7 +143,7 @@ function newLineItem(id = "line-1"): EditableLineItem {
 
 function initialInvoice(): EditableInvoice {
   return {
-    invoiceNumber: "1",
+    invoiceNumber: "",
     senderName: "",
     recipientName: "",
     issueDate: localDate(),
@@ -271,7 +272,9 @@ function InvoicePreview({ invoice }: { invoice: EditableInvoice }) {
     })
     .filter((item) => item.description.trim() || item.unitPrice > 0);
   const total = previewItems.reduce((sum, item) => sum + item.amount, 0);
-  const invoiceNumber = formatInvoiceNumber(invoice.invoiceNumber || "1");
+  const invoiceNumber = invoice.invoiceNumber
+    ? formatInvoiceNumber(invoice.invoiceNumber)
+    : "Assigned on download";
   const sender = invoice.senderName.trim() || "Your business";
   const recipient = invoice.recipientName.trim() || "Client name";
 
@@ -421,6 +424,7 @@ function ProfileDetailPanel({
 
 export function InvoiceApp() {
   const [invoice, setInvoice] = useState<EditableInvoice>(initialInvoice);
+  const [dueDateEdited, setDueDateEdited] = useState(false);
   const [invoiceErrors, setInvoiceErrors] = useState<FormErrors>({});
   const [downloadState, setDownloadState] = useState<"idle" | "loading" | "error">("idle");
   const [downloadError, setDownloadError] = useState("");
@@ -456,7 +460,9 @@ export function InvoiceApp() {
   const [adminNotice, setAdminNotice] = useState("");
 
   const invoicePayload = useMemo(() => ({
-    invoiceNumber: invoice.invoiceNumber,
+    // A real number is reserved only after draft validation and immediately
+    // before PDF generation. This placeholder is never sent to the PDF or API.
+    invoiceNumber: "AUTO",
     sender: {
       name: invoice.senderName,
     },
@@ -521,11 +527,27 @@ export function InvoiceApp() {
   }, []);
 
   function updateInvoice(field: InvoiceField, value: string) {
-    setInvoice((current) => ({ ...current, [field]: value }));
+    if (field === "dueDate") {
+      setDueDateEdited(true);
+      setInvoice((current) => ({ ...current, dueDate: value }));
+    } else if (field === "issueDate") {
+      setInvoice((current) => ({
+        ...current,
+        issueDate: value,
+        dueDate: syncDueDateWithIssueDate(
+          current.issueDate,
+          current.dueDate,
+          value,
+          dueDateEdited,
+        ),
+      }));
+    } else {
+      setInvoice((current) => ({ ...current, [field]: value }));
+    }
     setInvoiceErrors((current) => {
-      if (!current[field]) return current;
       const next = { ...current };
       delete next[field];
+      if (field === "issueDate") delete next.dueDate;
       return next;
     });
   }
@@ -589,10 +611,10 @@ export function InvoiceApp() {
   async function handleDownload(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setDownloadNotice("");
-    const result = validateInvoice(invoicePayload);
-    if (!result.valid || !result.data) {
+    const draftResult = validateInvoice(invoicePayload);
+    if (!draftResult.valid || !draftResult.data) {
       const errors: FormErrors = {};
-      for (const issue of result.issues) {
+      for (const issue of draftResult.issues) {
         if (!errors[issue.field]) errors[issue.field] = issue.message;
       }
       setInvoiceErrors(errors);
@@ -610,8 +632,16 @@ export function InvoiceApp() {
       : null;
     let pdfDownloaded = false;
     try {
+      const reservation = await apiRequest<{ invoiceNumber: string }>("/api/invoices/reserve", {
+        method: "POST",
+      });
+      const result = validateInvoice({ ...invoicePayload, invoiceNumber: reservation.invoiceNumber });
+      if (!result.valid || !result.data) {
+        throw new Error("The reserved invoice number could not be used.");
+      }
+
       await downloadInvoicePdf(result.data, {
-        filename: `${result.data.invoiceNumber}.pdf`,
+        filename: `${reservation.invoiceNumber}.pdf`,
         author: "Invoice-ish",
       });
       pdfDownloaded = true;
@@ -626,7 +656,7 @@ export function InvoiceApp() {
           method: "POST",
           body: JSON.stringify({
             amountCents,
-            invoiceNumber: result.data.invoiceNumber,
+            invoiceNumber: reservation.invoiceNumber,
           }),
         });
         const idempotent = isRecord(attachment) && (
@@ -856,8 +886,8 @@ export function InvoiceApp() {
             <div className="form-section">
               <div className="form-section-heading"><h3>Details</h3><span>Required fields are marked by their labels.</span></div>
               <div className="form-grid four-columns">
-                <Field id="invoice-number" label="Invoice number" error={invoiceErrors.invoiceNumber}>
-                  <input id="invoice-number" type="text" value={invoice.invoiceNumber} onChange={(event) => updateInvoice("invoiceNumber", event.target.value)} aria-invalid={Boolean(invoiceErrors.invoiceNumber)} aria-errormessage={invoiceErrors.invoiceNumber ? "invoice-number-error" : undefined} />
+                <Field id="invoice-number" label="Invoice number" hint="Assigned automatically when you download.">
+                  <output id="invoice-number" className="readonly-field">Assigned on download</output>
                 </Field>
                 <Field id="issue-date" label="Issue date" error={invoiceErrors.issueDate}>
                   <input id="issue-date" type="date" value={invoice.issueDate} onChange={(event) => updateInvoice("issueDate", event.target.value)} aria-invalid={Boolean(invoiceErrors.issueDate)} aria-errormessage={invoiceErrors.issueDate ? "issue-date-error" : undefined} />
