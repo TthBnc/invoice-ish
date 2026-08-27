@@ -9,6 +9,8 @@ import {
   generateInvoicePdf,
   syncDueDateWithIssueDate,
   validateInvoice,
+  WATERMARK_ROTATION_DEGREES,
+  WATERMARK_TEXT,
 } from "../src/lib/invoice";
 import { PDFDocument } from "pdf-lib";
 
@@ -30,10 +32,12 @@ describe("invoice formatting", () => {
   it("centers rotated text using its projected width", () => {
     const pageWidth = 595.28;
     const textWidth = 315.224;
-    const rotationDegrees = -24;
+    const rotationDegrees = WATERMARK_ROTATION_DEGREES;
     const projectedWidth = textWidth * Math.cos((rotationDegrees * Math.PI) / 180);
     const x = centeredRotatedTextX(pageWidth, textWidth, rotationDegrees);
 
+    expect(WATERMARK_TEXT).toBe("Invoice-ish");
+    expect(rotationDegrees).toBeGreaterThan(0);
     expect(x + projectedWidth / 2).toBeCloseTo(pageWidth / 2);
     expect(centeredRotatedTextX(pageWidth, textWidth, 0)).toBeCloseTo(
       pageWidth / 2 - textWidth / 2,
