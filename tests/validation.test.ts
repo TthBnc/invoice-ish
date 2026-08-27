@@ -48,13 +48,13 @@ describe("ledger validation", () => {
   });
 
   it("requires a positive safe integer and invoice number for attachments", () => {
-    expect(invoiceAttachmentSchema.parse({ amountCents: 150_000, invoiceNumber: " INV-0001 " })).toEqual({
+    expect(invoiceAttachmentSchema.parse({ amountCents: 150_000, invoiceNumber: " ISH-0001 " })).toEqual({
       amountCents: 150_000,
-      invoiceNumber: "INV-0001",
+      invoiceNumber: "ISH-0001",
     });
-    expect(invoiceAttachmentSchema.safeParse({ amountCents: 0, invoiceNumber: "INV-0001" }).success).toBe(false);
-    expect(invoiceAttachmentSchema.safeParse({ amountCents: 1.5, invoiceNumber: "INV-0001" }).success).toBe(false);
-    expect(invoiceAttachmentSchema.safeParse({ amountCents: Number.MAX_SAFE_INTEGER + 1, invoiceNumber: "INV-0001" }).success).toBe(false);
+    expect(invoiceAttachmentSchema.safeParse({ amountCents: 0, invoiceNumber: "ISH-0001" }).success).toBe(false);
+    expect(invoiceAttachmentSchema.safeParse({ amountCents: 1.5, invoiceNumber: "ISH-0001" }).success).toBe(false);
+    expect(invoiceAttachmentSchema.safeParse({ amountCents: Number.MAX_SAFE_INTEGER + 1, invoiceNumber: "ISH-0001" }).success).toBe(false);
     expect(invoiceAttachmentSchema.safeParse({ amountCents: 100, invoiceNumber: "   " }).success).toBe(false);
   });
 });

@@ -111,28 +111,28 @@ describe("profiles with an isolated local PGlite database", () => {
     const first = await createProfile("Invoice First", "HUF");
     const second = await createProfile("Invoice Second", "HUF");
 
-    const attached = await attachInvoiceToProfile(first.id, 150_000, " INV-0001 ");
+    const attached = await attachInvoiceToProfile(first.id, 150_000, " ISH-0001 ");
     expect(attached?.newlyAttached).toBe(true);
     expect(attached?.attached).toBe(true);
     expect(attached?.entry).toMatchObject({
       type: "charge",
       amountCents: 150_000,
-      note: "Invoice INV-0001",
-      referenceKey: "inv-0001",
+      note: "Invoice ISH-0001",
+      referenceKey: "ish-0001",
     });
     expect(attached?.profile.currentBalanceCents).toBe(150_000);
 
-    const duplicate = await attachInvoiceToProfile(first.id, 999_999, "inv-0001");
+    const duplicate = await attachInvoiceToProfile(first.id, 999_999, "ish-0001");
     expect(duplicate?.newlyAttached).toBe(false);
     expect(duplicate?.attached).toBe(false);
     expect(duplicate?.entry?.amountCents).toBe(150_000);
     expect(duplicate?.profile.currentBalanceCents).toBe(150_000);
     expect((await getProfileWithLedger(first.id))?.transactions).toHaveLength(1);
 
-    const sameInvoiceOtherProfile = await attachInvoiceToProfile(second.id, 150_000, "INV-0001");
+    const sameInvoiceOtherProfile = await attachInvoiceToProfile(second.id, 150_000, "ISH-0001");
     expect(sameInvoiceOtherProfile?.newlyAttached).toBe(true);
 
-    const differentInvoice = await attachInvoiceToProfile(first.id, 20_000, "INV-0002");
+    const differentInvoice = await attachInvoiceToProfile(first.id, 20_000, "ISH-0002");
     expect(differentInvoice?.newlyAttached).toBe(true);
     expect(differentInvoice?.profile.currentBalanceCents).toBe(170_000);
 
@@ -141,8 +141,8 @@ describe("profiles with an isolated local PGlite database", () => {
   });
 
   it("reserves globally unique, padded invoice numbers under concurrent requests", async () => {
-    expect(await reserveInvoiceNumber()).toBe("INV-0001");
-    expect(await reserveInvoiceNumber()).toBe("INV-0002");
+    expect(await reserveInvoiceNumber()).toBe("ISH-0001");
+    expect(await reserveInvoiceNumber()).toBe("ISH-0002");
 
     const responses = await Promise.all(
       Array.from({ length: 8 }, () => reserveInvoiceRoute()),
@@ -153,14 +153,14 @@ describe("profiles with an isolated local PGlite database", () => {
     );
     expect(new Set(numbers).size).toBe(numbers.length);
     expect([...numbers].sort()).toEqual([
-      "INV-0003",
-      "INV-0004",
-      "INV-0005",
-      "INV-0006",
-      "INV-0007",
-      "INV-0008",
-      "INV-0009",
-      "INV-0010",
+      "ISH-0003",
+      "ISH-0004",
+      "ISH-0005",
+      "ISH-0006",
+      "ISH-0007",
+      "ISH-0008",
+      "ISH-0009",
+      "ISH-0010",
     ]);
   });
 
@@ -176,14 +176,14 @@ describe("profiles with an isolated local PGlite database", () => {
     );
 
     const firstResponse = await attachInvoiceRoute(
-      invoiceRequest(50_000, "INV-ROUTE-1"),
+      invoiceRequest(50_000, "ISH-ROUTE-1"),
       { params: Promise.resolve({ id: first.id }) },
     );
     expect(firstResponse.status).toBe(201);
     expect(await firstResponse.json()).toMatchObject({ newlyAttached: true, attached: true, idempotent: false });
 
     const duplicateResponse = await attachInvoiceRoute(
-      invoiceRequest(99_999, "inv-route-1"),
+      invoiceRequest(99_999, "ish-route-1"),
       { params: Promise.resolve({ id: first.id }) },
     );
     expect(duplicateResponse.status).toBe(200);

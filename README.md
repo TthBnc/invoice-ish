@@ -69,8 +69,44 @@ Invoice numbers come from the persistent `invoice_number_sequence` PostgreSQL
 sequence added by migration `004_invoice_number_sequence.sql`. The browser
 reserves the next number only when the visitor downloads a PDF, so abandoned
 drafts do not consume numbers. Sequence gaps are allowed if PDF generation
-fails after reservation. The number is formatted as `INV-0001`, `INV-0002`,
-and so on, with no four-digit upper limit.
+fails after reservation. The number is formatted as `ISH-0001`, `ISH-0002`,
+and so on, with no four-digit upper limit. Explicitly supplied identifiers with
+another prefix (such as an imported `INV-0042`) keep that prefix.
+
+## One-time historical backfill
+
+The checked-in `scripts/backfill-manifest.ts` contains the 14 historical
+menubar invoices. The import maps `bocsbe` to `másik Bence`, maps `bölö` to
+`Bölö`, keeps `bölö department` separate, and records every historical invoice
+as an outstanding HUF charge with its original date, line descriptions, and a
+unique reference key. It also advances the automatic sequence to `ISH-0015`
+when the sequence is still below that value; a sequence already beyond 14 is
+never rewound.
+
+The command is deliberately a read-only dry run by default:
+
+```bash
+npm run backfill
+```
+
+Review its profile, invoice, total, duplicate, and sequence report before
+applying. To apply, use a direct/unpooled database URL for Neon:
+
+```bash
+npm run backfill:apply
+```
+
+`backfill:apply` requires `DATABASE_URL_UNPOOLED` when a hosted database URL is
+present and runs the import in a transaction. It validates all 14 references,
+amounts, dates, notes, canonical profiles, and the next sequence value before
+committing. It is safe to rerun: existing references are skipped, and when an
+alias and canonical profile both exist, non-conflicting ledger entries move to
+the canonical profile while duplicate references are preserved and reported.
+The commands load the repository's `.env.local` automatically through Next's
+environment loader; they never print those values.
+For local PGlite, leave both database URLs unset; the apply command uses the
+persistent `.data/pglite` database. The dry run does not run migrations or
+create a new local database, so run `npm run db:migrate` first when needed.
 
 ## API
 

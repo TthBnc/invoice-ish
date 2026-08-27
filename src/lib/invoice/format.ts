@@ -114,14 +114,16 @@ export function formatQuantity(value: number, locale: InvoiceLocale = "en"): str
   }).format(value);
 }
 
+export const DEFAULT_INVOICE_PREFIX = "ISH";
+
 /**
- * Format a number or an already meaningful identifier as `INV-0001`.
+ * Format a number or an already meaningful identifier as `ISH-0001`.
  * Existing prefixed identifiers are preserved (apart from casing), while a
  * plain numeric value receives four-digit zero padding.
  */
 export function formatInvoiceNumber(
   value: string | number,
-  prefix = "INV",
+  prefix = DEFAULT_INVOICE_PREFIX,
   width = 4,
 ): string {
   const normalizedPrefix = prefix.trim().toUpperCase();
@@ -130,6 +132,13 @@ export function formatInvoiceNumber(
 
   const upper = raw.toUpperCase();
   if (normalizedPrefix && (upper === normalizedPrefix || upper.startsWith(`${normalizedPrefix}-`))) {
+    return upper;
+  }
+
+  // A caller may intentionally provide a different, already-prefixed
+  // identifier (for example, an imported legacy `INV-0042`). Preserve it
+  // rather than nesting it under the current default prefix.
+  if (/^[A-Z][A-Z0-9]*-/i.test(raw)) {
     return upper;
   }
 

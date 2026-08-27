@@ -41,7 +41,7 @@ describe("invoice formatting", () => {
   });
 
   it("formats invoice numbers with a stable padded identifier", () => {
-    expect(formatInvoiceNumber(7)).toBe("INV-0007");
+    expect(formatInvoiceNumber(7)).toBe("ISH-0007");
     expect(formatInvoiceNumber("inv-2026-12")).toBe("INV-2026-12");
     expect(formatInvoiceNumber("12", "BILL", 3)).toBe("BILL-012");
   });
@@ -71,7 +71,7 @@ describe("invoice validation", () => {
     const result = validateInvoice(validInput);
     expect(result.valid).toBe(true);
     expect(result.issues).toHaveLength(0);
-    expect(result.data?.invoiceNumber).toBe("INV-0007");
+    expect(result.data?.invoiceNumber).toBe("ISH-0007");
     expect(result.data?.lineItems.map((item) => item.amount)).toEqual([25, 5]);
     expect(result.data?.subtotal).toBe(30);
     expect(result.data?.total).toBe(30);
